@@ -1,5 +1,3 @@
-# ProbaPrePractica
-
 /*  
  *  ------ [Ga_v30_5] CO Sensor reading for v30  -------- 
  *  
@@ -29,36 +27,13 @@
 
 // Library include
 #include <WaspWIFI_PRO_V3.h>
-#include <WaspSensorGas_v30.h>
 #include <WaspFrame.h>
-
+#include <WaspSensorGas_Pro.h>
+#include <WaspSensorGas_v30.h>
 
 // CO Sensor must be connected physically in SOCKET_4
 COSensorClass COSensor; 
-// choose socket (SELECT USER'S SOCKET)
-///////////////////////////////////////
-uint8_t socket = SOCKET0;
-///////////////////////////////////////
 
-// WiFi AP settings (CHANGE TO USER'S AP)
-///////////////////////////////////////
-char SSID[] = "LANCOMBEIA";
-char PASSW[] = "beialancom";
-///////////////////////////////////////
-
-// define variables
-uint8_t error;
-uint8_t status;
-unsigned long previous;
-// choose HTTP server settings
-///////////////////////////////////////
-char type[] = "http";
-char host[] = "82.78.81.171";
-uint16_t port = 80;
-///////////////////////////////////////
-
-// define the Waspmote ID 
-char moteID[] = "RistoJorgo";
 // Concentratios used in calibration process
 #define POINT1_PPM_CO 100.0   // <--- Ro value at this concentration
 #define POINT2_PPM_CO 300.0   // 
@@ -75,11 +50,41 @@ char moteID[] = "RistoJorgo";
 float concentrations[] = { POINT1_PPM_CO, POINT2_PPM_CO, POINT3_PPM_CO };
 float resValues[] =      { POINT1_RES_CO, POINT2_RES_CO, POINT3_RES_CO };
 
-char node_ID[] = "CO_example";
+char node_ID[] = "RistoJorgo";
+// choose socket (SELECT USER'S SOCKET)
+///////////////////////////////////////
+uint8_t socket = SOCKET0;
+///////////////////////////////////////
 
+// WiFi AP settings (CHANGE TO USER'S AP)
+///////////////////////////////////////
+char SSID[] = "LANCOMBEIA";
+char PASSW[] = "beialancom";
+
+
+
+
+
+
+///////////////////////////////////////
+
+// define variables
+uint8_t error;
+uint8_t status;
+unsigned long previous;
+// choose HTTP server settings
+///////////////////////////////////////
+char type[] = "http";
+char host[] = "82.78.81.171";
+uint16_t port = 80;
+
+///////////////////////////////////////
+
+// define the Waspmote ID 
+char moteID[] = "Risto_Jorgo";
 void setup() 
 {
-   USB.println(F("Start program"));
+  USB.println(F("Start program"));
 
   //////////////////////////////////////////////////
   // 1. Switch ON the WiFi module
@@ -218,7 +223,8 @@ void setup()
       };
     */
   }
-    frame.setID(moteID);  
+    frame.setID(moteID); 
+  
   // Configure the USB port
   USB.ON();
   USB.println(F("CO Sensor reading for v30..."));
@@ -235,10 +241,10 @@ void setup()
   // Switch ON the sensor socket
   COSensor.ON();
 }
-
 void loop()
-{ 
-   // Check if module is connected
+{
+
+  // Check if module is connected
   if (WIFI_PRO_V3.isConnected() == true)
   {
     USB.print(F("WiFi is connected OK"));
@@ -246,7 +252,7 @@ void loop()
     USB.println(millis() - previous);
 
     USB.println(F("\n*** Program stops ***"));
-  //////////////////////////////////////////
+//////////////////////////////////////////
   // 2. Read sensors
   //////////////////////////////////////////
   
@@ -278,7 +284,12 @@ void loop()
   frame.addSensor(SENSOR_GASES_CO, COPPM);
   // Show the frame
   frame.showFrame();    
- // http frame
+
+    ///////////////////////////////
+    // 3.2. Send Frame to Meshlium
+    ///////////////////////////////
+
+    // http frame
     error = WIFI_PRO_V3.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);
 
     // check response
@@ -307,4 +318,3 @@ void loop()
   delay(10000);
 
 }
-
